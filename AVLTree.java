@@ -214,6 +214,38 @@ public class AVLTree {
         }
     }
 
+    // Tree visualization of the AVL tree in the form of a string
+    public char[][] visual() {
+    	// an array of chars whose size grows exponentially from the tree height
+    	char[][] visualFrame = new char[root.height * 2 - 1][(int)Math.pow(2, root.height + 2) + 1];
+    	
+    	// first filling puts the root at the top middle of the frame, then its children
+    	// are placed in the next row, 1/4 of the frame width to the left and to the right respectively
+    	int shift = visualFrame[0].length / 4; // to be halved again later
+    	for(char[] row : visualFrame)
+    		java.util.Arrays.fill(row, ' '); // fill array with spaces instead of ugly null characters
+    	
+    	fillVisualFrame(visualFrame, root, 0, visualFrame[0].length / 2 - 4, shift);
+    	
+    	return visualFrame;
+    }
+    
+    // a call to this method will copy the name of a node into a frame starting at the specified row and column
+    // in addition to its children to the left and right below, shifted by shift / 2
+    public static void fillVisualFrame(char[][] frame, TreeNode currNode, int row, int col, int shift) {
+	    for(int i = 0; i < Math.min(7, currNode.name.length()); i ++) 
+	    	frame[row][col + i] = currNode.name.charAt(i);
+	    // fill the names of the children with recursive calls:
+	    if(currNode.left != null) {
+	    	frame[row + 1][col - shift / 2] = '/'; // add diagonal connectors
+	    	fillVisualFrame(frame, currNode.left, row + 2, col - shift, shift / 2);
+	    }
+	    if(currNode.right != null) {
+	    	frame[row + 1][col + shift / 2 + 2] = '\\';
+	    	fillVisualFrame(frame, currNode.right, row + 2, col + shift, shift / 2);
+	    }
+    }
+
     public static void main(String[] args) {
         AVLTree avlTree = new AVLTree();
 
@@ -223,6 +255,10 @@ public class AVLTree {
         avlTree.root = avlTree.insert(avlTree.root, "David");
         avlTree.root = avlTree.insert(avlTree.root, "Eve");
         avlTree.root = avlTree.insert(avlTree.root, "Frank");
+
+        System.out.println("Starting tree with six names: ");
+        for(char[] row : avlTree.visual())
+        	System.out.println(row);
 
         System.out.println("In-order traversal of AVL tree:");
         avlTree.inOrderTraversal(avlTree.root); // Should print the sorted order of inserted names
